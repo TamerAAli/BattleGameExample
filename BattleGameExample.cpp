@@ -1,9 +1,9 @@
-namespace Lec1
-{
 #include <iostream>
 #include <string>
-	using namespace std;
+using namespace std;
 
+namespace Lec1
+{
 	class A
 	{
 	protected:
@@ -58,9 +58,6 @@ namespace Lec1
 
 namespace Lec2
 {
-#include <iostream>
-#include <string>
-	using namespace std;
 	enum ArmyUnitType { Soldier, AirCraft, Tank, Undefined };
 
 	class ArmyUnit
