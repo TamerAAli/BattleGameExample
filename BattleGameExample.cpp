@@ -4,24 +4,6 @@ using namespace std;
 
 namespace Lec1
 {
-	class A
-	{
-	protected:
-		virtual string doSthg()
-		{
-			return "Hi";
-		}
-	};
-
-	class B : public A
-	{
-	public:
-		string doSthg() override
-		{
-			return "Hello";
-		}
-	};
-
 	enum ArmyUnitType { SoldierType, AirCraftType, TankType };
 
 	class ArmyUnit
@@ -41,6 +23,38 @@ namespace Lec1
 		virtual string toString() const = 0;
 		ArmyUnitType getUnitType() const { return unitType; }
 
+		bool fireAT(ArmyUnit* target)
+		{
+			if (
+				this->isAlive() &&
+				this->ammu > 0 &&
+				target &&
+				target->isAlive() &&
+				this->canFireAt(target)
+				)
+			{
+				this->ammu--;
+				return target->takeDamage(this);
+			}
+		}
+
+		bool takeDamage(const ArmyUnit* enemy)
+		{
+			if (this->canTakeDamageFrom(enemy))
+			{
+				this->health -= enemy->strength;
+				return true;
+			}
+			return false;
+		}
+
+		virtual bool canTakeDamageFrom( const ArmyUnit* potentialEnemy) const = 0;
+
+		virtual bool canFireAt(const ArmyUnit* potentialTarget) const
+		{
+			return this != potentialTarget;
+		}
+
 	};
 
 	class Tank : public ArmyUnit
@@ -52,7 +66,53 @@ namespace Lec1
 		{
 			return "Tank";
 		}
+		virtual bool canFireAt(const ArmyUnit* potentialTarget) const override
+		{
+			return ArmyUnit::canFireAt(potentialTarget) &&
+				potentialTarget->getUnitType() != AirCraftType;
+		}
 
+
+		// Inherited via ArmyUnit
+		virtual bool canTakeDamageFrom(const ArmyUnit* potentialEnemy) const override
+		{
+			return true;
+		}
+
+	};
+
+	class Soldier : public ArmyUnit
+	{
+	public:
+		Soldier() : ArmyUnit(100, 100, 100, SoldierType)
+		{}
+		virtual string toString() const
+		{
+			return "Soldier";
+		}
+
+		// Inherited via ArmyUnit
+		virtual bool canTakeDamageFrom(const ArmyUnit* potentialEnemy) const override
+		{
+			return true;
+		}
+	};
+
+	class AirCraft : public ArmyUnit
+	{
+	public:
+		AirCraft() : ArmyUnit(50, 50, 5000, AirCraftType)
+		{}
+		virtual string toString() const
+		{
+			return "AirCraft";
+		}
+
+		// Inherited via ArmyUnit
+		virtual bool canTakeDamageFrom(const ArmyUnit* potentialEnemy) const override
+		{
+			return true;
+		}
 	};
 }
 
@@ -99,4 +159,6 @@ namespace Lec2
 using namespace Lec2;
 int main()
 {
+
+
 }
