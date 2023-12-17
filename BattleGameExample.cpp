@@ -66,19 +66,12 @@ namespace Lec1
 		{
 			return "Tank";
 		}
-		virtual bool canFireAt(const ArmyUnit* potentialTarget) const override
-		{
-			return ArmyUnit::canFireAt(potentialTarget) &&
-				potentialTarget->getUnitType() != AirCraftType;
-		}
-
 
 		// Inherited via ArmyUnit
 		virtual bool canTakeDamageFrom(const ArmyUnit* potentialEnemy) const override
 		{
 			return true;
 		}
-
 	};
 
 	class Soldier : public ArmyUnit
@@ -118,7 +111,7 @@ namespace Lec1
 
 namespace Lec2
 {
-	enum ArmyUnitType { Soldier, AirCraft, Tank, Undefined };
+	enum ArmyUnitType { SoldierType, AirCraftType, TankType, UndefinedType};
 
 	class ArmyUnit
 	{
@@ -126,9 +119,10 @@ namespace Lec2
 		int strength = 0;
 		int health = 0;
 		int ammu = 0;
-		ArmyUnitType unitType = Undefined;
+		ArmyUnitType unitType;
 
 	public:
+		ArmyUnitType getUnitType() const { return this->unitType; }
 		virtual bool fireAt(ArmyUnit* target)
 		{
 			if (
@@ -144,15 +138,48 @@ namespace Lec2
 			}
 		}
 		bool isAlive() const { return this->health > 0; }
-		virtual bool canFireAt(ArmyUnit* target) = 0;
-		bool takeDamageFrom(ArmyUnit* enemy)
+		virtual bool canFireAt(const ArmyUnit* target) const { return true; }
+		bool takeDamageFrom(const ArmyUnit* enemy)
 		{
 			if (this->canTakeDamageFrom(enemy))
 			{
 				this->health -= min(enemy->strength, this->health);
 			}
 		}
-		virtual bool canTakeDamageFrom(ArmyUnit* enemy) = 0;
+		virtual bool canTakeDamageFrom(const ArmyUnit* enemy) const { return true; }
+		virtual string toString() const = 0;
+
+		ArmyUnit(int strength, int health, int ammu, ArmyUnitType unitType)
+			: strength(strength), health(health), ammu(ammu), unitType(unitType)
+		{}
+	};
+
+	class Soldier : public ArmyUnit
+	{
+	public:
+		Soldier():ArmyUnit(100, 100, 100, SoldierType)
+		{}
+		virtual string toString() const override { return "Soldier"; }
+	};
+
+	class Tank : public ArmyUnit
+	{
+	public:
+		Tank() :ArmyUnit(1000, 500, 10, TankType)
+		{}
+		virtual string toString() { return "Tank"; }
+		virtual bool canFireAt(const ArmyUnit* target) const override
+		{
+			return target->getUnitType();
+		}
+	};
+
+	class AirCraft : public ArmyUnit
+	{
+	public:
+		AirCraft() :ArmyUnit(50, 200, 1000, AirCraftType)
+		{}
+		virtual string toString() { return "Air Craft"; }
 	};
 }
 
