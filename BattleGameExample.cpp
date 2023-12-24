@@ -202,5 +202,5 @@ namespace Lec2
 
 int main()
 {
-	Lec1::main();
+	Lec2::main();
 }
