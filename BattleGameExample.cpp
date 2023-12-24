@@ -9,104 +9,116 @@ namespace Lec1
 	class ArmyUnit
 	{
 	protected:
-		int health = 0;
 		int strength = 0;
+		int health = 0;
 		int ammu = 0;
 		ArmyUnitType unitType;
 
-		ArmyUnit(int health, int strength, int ammu, ArmyUnitType unitType)
-			: health(health), strength(strength), ammu(ammu), unitType(unitType)
-		{}
-
 	public:
-		bool isAlive() const { return health > 0; }
-		virtual string toString() const = 0;
-		ArmyUnitType getUnitType() const { return unitType; }
-
-		bool fireAT(ArmyUnit* target)
+		ArmyUnitType getUnitType() const { return this->unitType; }
+		virtual bool fireAt(ArmyUnit* target)
 		{
 			if (
+				target != nullptr &&
 				this->isAlive() &&
 				this->ammu > 0 &&
-				target &&
 				target->isAlive() &&
 				this->canFireAt(target)
 				)
 			{
 				this->ammu--;
-				return target->takeDamage(this);
+				return target->takeDamageFrom(this);
 			}
+			return false;
 		}
-
-		bool takeDamage(const ArmyUnit* enemy)
+		bool isAlive() const { return this->health > 0; }
+		virtual bool canFireAt(const ArmyUnit* target) const { return true; }
+		bool takeDamageFrom(const ArmyUnit* enemy)
 		{
 			if (this->canTakeDamageFrom(enemy))
 			{
-				this->health -= enemy->strength;
+				this->health -= min(enemy->strength, this->health);
 				return true;
 			}
 			return false;
 		}
+		virtual bool canTakeDamageFrom(const ArmyUnit* enemy) const { return true; }
+		virtual string toString() const = 0;
 
-		virtual bool canTakeDamageFrom( const ArmyUnit* potentialEnemy) const = 0;
-
-		virtual bool canFireAt(const ArmyUnit* potentialTarget) const
-		{
-			return this != potentialTarget;
-		}
-
-	};
-
-	class Tank : public ArmyUnit
-	{
-	public:
-		Tank() : ArmyUnit(1000, 500, 10, TankType)
+		ArmyUnit(int strength, int health, int ammu, ArmyUnitType unitType)
+			: strength(strength), health(health), ammu(ammu), unitType(unitType)
 		{}
-		virtual string toString() const
-		{
-			return "Tank";
-		}
-
-		// Inherited via ArmyUnit
-		virtual bool canTakeDamageFrom(const ArmyUnit* potentialEnemy) const override
-		{
-			return true;
-		}
 	};
 
 	class Soldier : public ArmyUnit
 	{
 	public:
-		Soldier() : ArmyUnit(100, 100, 100, SoldierType)
+		Soldier() :ArmyUnit(100, 1000, 100, SoldierType)
 		{}
-		virtual string toString() const
-		{
-			return "Soldier";
-		}
+		virtual string toString() const override { return "Soldier"; }
+	};
 
-		// Inherited via ArmyUnit
-		virtual bool canTakeDamageFrom(const ArmyUnit* potentialEnemy) const override
+	class Tank : public ArmyUnit
+	{
+	public:
+		Tank() :ArmyUnit(50000, 5000, 10, TankType)
+		{}
+		virtual string toString() { return "Tank"; }
+		virtual bool canFireAt(const ArmyUnit* target) const override
 		{
-			return true;
+			return target->getUnitType();
 		}
+		virtual string toString() const override { return "Tank"; }
 	};
 
 	class AirCraft : public ArmyUnit
 	{
 	public:
-		AirCraft() : ArmyUnit(50, 50, 5000, AirCraftType)
+		AirCraft() :ArmyUnit(50, 2000, 1000, AirCraftType)
 		{}
-		virtual string toString() const
+		virtual string toString() const override { return "Air Craft"; }
+	};
+
+	int main()
+	{
+		ArmyUnit** army = new ArmyUnit * [10];
+		int count = 0;
+		army[count++] = new Soldier;
+		army[count++] = new Soldier;
+		army[count++] = new Soldier;
+		army[count++] = new Soldier;
+		army[count++] = new Soldier;
+		army[count++] = new Soldier;
+		army[count++] = new Tank;
+		army[count++] = new Tank;
+		army[count++] = new AirCraft;
+		army[count++] = new AirCraft;
+
+		for (int i = 0; i < 10; i++)
 		{
-			return "AirCraft";
+			for (int j = 0; j < 10; j++)
+			{
+				if (army[i]->fireAt(army[j]))
+				{
+					cout << army[i]->toString() << i << " fired at " << army[j]->toString() << j << endl;
+					if (!army[j]->isAlive())
+					{
+						cout << army[j]->toString() << "is dead!" << endl;
+					}
+				}
+			}
+			cout << string(20, '-') << endl;
 		}
 
-		// Inherited via ArmyUnit
-		virtual bool canTakeDamageFrom(const ArmyUnit* potentialEnemy) const override
+		for (int i = 0; i < 10; i++)
 		{
-			return true;
+			if (army[i]->isAlive())
+			{
+				cout << army[i]->toString() << i << "is still alive!" << endl;
+			}
 		}
-	};
+		return 0;
+	}
 }
 
 namespace Lec2
@@ -181,11 +193,14 @@ namespace Lec2
 		{}
 		virtual string toString() { return "Air Craft"; }
 	};
+
+	int main()
+	{
+		return 0;
+	}
 }
 
-using namespace Lec2;
 int main()
 {
-
-
+	Lec2::main();
 }
