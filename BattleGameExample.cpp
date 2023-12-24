@@ -114,11 +114,7 @@ namespace Lec1
 		{
 			if (army[i]->isAlive())
 			{
-<<<<<<< HEAD
-				cout << army[i]->toString() << i << "is still alive!" << endl;
-=======
 				cout << army[i]->toString() << i << " is still alive!" << endl;
->>>>>>> W13
 			}
 		}
 		return 0;
@@ -206,9 +202,5 @@ namespace Lec2
 
 int main()
 {
-<<<<<<< HEAD
-	Lec2::main();
-=======
 	Lec1::main();
->>>>>>> W13
 }
